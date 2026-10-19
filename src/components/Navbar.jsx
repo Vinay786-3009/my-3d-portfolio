@@ -1,108 +1,171 @@
 import React, { useState, useEffect } from 'react';
 import { personalInfo } from '../data/portfolioData';
-import { Menu, X, FileText } from 'lucide-react';
-import { GithubIcon, LinkedinIcon } from './Icons';
+import { useTheme } from '../hooks/useTheme';
+import { Menu, X, FileText, Palette, Check } from 'lucide-react';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
+  const { theme, changeTheme, themes } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
+
+      const sectionIds = ['home', 'about', 'experience', 'projects', 'certifications', 'contact'];
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= window.innerHeight * 0.4 && rect.bottom >= window.innerHeight * 0.2) {
+            setActiveSection(id);
+            break;
+          }
+        }
+      }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const navLinks = [
-    { name: 'About', href: '#about' },
-    { name: 'Projects', href: '#projects' },
-    { name: 'Skills', href: '#skills' },
-    { name: 'Experience', href: '#experience' },
-    { name: 'Education', href: '#education' },
-    { name: 'Contact', href: '#contact' }
+    { name: 'About', href: '#about', id: 'about' },
+    { name: 'Experience', href: '#experience', id: 'experience' },
+    { name: 'Projects', href: '#projects', id: 'projects' },
+    { name: 'Certifications', href: '#certifications', id: 'certifications' },
+    { name: 'Contact', href: '#contact', id: 'contact' }
   ];
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-slate-950/85 backdrop-blur-md border-b border-slate-800/80 shadow-lg shadow-black/30 py-3'
+          ? 'bg-[#12151B]/90 backdrop-blur-md border-b border-[#2A313E] shadow-xl py-3.5'
           : 'bg-transparent py-5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
+          
           {/* Brand Logo */}
           <a
             href="#"
-            className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-cyan-500 rounded-lg p-1"
-            aria-label="Bangalore Vinay Portfolio Home"
+            className="flex items-center gap-3 group focus:outline-none"
+            aria-label="Bangalore Vinay Portfolio"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 border border-cyan-500/40 flex items-center justify-center font-display font-bold text-lg text-cyan-400 group-hover:border-cyan-400 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all">
+            <div className="w-10 h-10 rounded-full bg-[#181C22] border-2 border-[var(--color-accent)] flex items-center justify-center font-bold text-sm text-[var(--color-accent)] shadow-sm group-hover:scale-105 group-hover:border-white transition-all">
               {personalInfo.monogram}
             </div>
             <div className="flex flex-col">
-              <span className="font-display font-semibold text-base tracking-tight text-white group-hover:text-cyan-300 transition-colors">
+              <span className="font-bold text-base tracking-wide text-white group-hover:text-[var(--color-accent)] transition-colors">
                 {personalInfo.name}
               </span>
-              <span className="text-[11px] font-mono text-slate-400">
-                Full-Stack &amp; Software Dev
+              <span className="text-[11px] font-medium text-gray-400">
+                {personalInfo.roleBadge}
               </span>
             </div>
           </a>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1.5 p-1 rounded-full bg-slate-900/70 border border-slate-800/90 backdrop-blur-md shadow-inner">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="px-4 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/70 rounded-full transition-all duration-150"
-              >
-                {link.name}
-              </a>
-            ))}
+          {/* Desktop Floating Pill Navigation */}
+          <nav className="hidden md:flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#181C22] border border-[#2A313E] shadow-lg">
+            {navLinks.map((link) => {
+              const isActive = activeSection === link.id;
+              return (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 ${
+                    isActive
+                      ? 'bg-[var(--color-accent)] text-black shadow-md'
+                      : 'text-gray-300 hover:text-[var(--color-accent)] hover:bg-[#222733]'
+                  }`}
+                >
+                  {link.name}
+                </a>
+              );
+            })}
           </nav>
 
-          {/* Right Action: Status & Resume CTA */}
-          <div className="hidden lg:flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/50 border border-cyan-800/50 text-[11px] font-medium text-cyan-300">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-              </span>
-              <span>Open to Roles</span>
+          {/* Right Action: Theme Switcher & Resume CTA */}
+          <div className="hidden lg:flex items-center gap-3 relative">
+            
+            {/* Color Palette Switcher Trigger */}
+            <div className="relative">
+              <button
+                onClick={() => setPaletteOpen(!paletteOpen)}
+                className="p-2 rounded-full bg-[#181C22] border border-[#2A313E] hover:border-[var(--color-accent)] text-gray-300 hover:text-[var(--color-accent)] transition-all cursor-pointer flex items-center gap-1.5 text-xs font-medium"
+                title="Change Portfolio Color Theme"
+              >
+                <Palette className="w-4 h-4 text-[var(--color-accent)]" />
+                <span className="capitalize">{theme}</span>
+              </button>
+
+              {/* Theme Dropdown Palette */}
+              {paletteOpen && (
+                <div className="absolute right-0 mt-2 w-56 p-2 rounded-2xl bg-[#14171E] border border-[var(--color-accent)]/50 shadow-2xl z-50 animate-in fade-in slide-in-from-top-2">
+                  <div className="text-[10px] font-mono text-gray-400 px-2 py-1 uppercase tracking-wider">
+                    Select Accent Palette
+                  </div>
+                  <div className="space-y-1">
+                    {themes.map((t) => (
+                      <button
+                        key={t.id}
+                        onClick={() => {
+                          changeTheme(t.id);
+                          setPaletteOpen(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                          theme === t.id
+                            ? 'bg-[#222834] text-white border border-[var(--color-accent)]/40'
+                            : 'text-gray-300 hover:bg-[#1C212B]'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span
+                            style={{ backgroundColor: t.primary }}
+                            className="w-3.5 h-3.5 rounded-full border border-white/20"
+                          />
+                          <span>{t.name}</span>
+                        </div>
+                        {theme === t.id && <Check className="w-3.5 h-3.5 text-[var(--color-accent)]" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
+            {/* Resume Button */}
             <a
               href={personalInfo.resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 hover:border-cyan-400 text-xs font-semibold text-cyan-300 transition-all shadow-xs"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full border border-[var(--color-accent)] text-xs font-bold text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-black transition-all shadow-sm"
             >
               <FileText className="w-3.5 h-3.5" />
               <span>Resume PDF</span>
             </a>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu & Theme Switcher */}
           <div className="flex items-center gap-2 md:hidden">
-            <a
-              href={personalInfo.resumeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 py-1 rounded-md bg-cyan-500/10 border border-cyan-500/30 text-xs font-medium text-cyan-300"
+            <button
+              onClick={() => {
+                const nextTheme = theme === 'emerald' ? 'violet' : theme === 'violet' ? 'cyan' : theme === 'cyan' ? 'amber' : 'emerald';
+                changeTheme(nextTheme);
+              }}
+              className="p-2 rounded-full bg-[#181C22] border border-[#2A313E] text-[var(--color-accent)]"
+              title="Switch Theme"
             >
-              Resume
-            </a>
+              <Palette className="w-4 h-4" />
+            </button>
+
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              type="button"
-              className="p-2 rounded-lg text-slate-400 hover:text-white bg-slate-900/80 border border-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className="p-2 rounded-lg bg-[#181C22] border border-[#2A313E] text-gray-300 hover:text-white"
               aria-label="Toggle navigation menu"
-              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -112,46 +175,34 @@ export default function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-slate-950/98 border-b border-slate-800 backdrop-blur-2xl px-4 pt-4 pb-6 space-y-3">
-          <div className="grid grid-cols-2 gap-2">
+        <div className="md:hidden bg-[#101318] border-b border-[#2A313E] px-4 pt-3 pb-6 shadow-2xl animate-in slide-in-from-top-2">
+          <nav className="flex flex-col gap-2">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-cyan-300 hover:bg-slate-900 border border-slate-800/70"
+                className={`px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                  activeSection === link.id
+                    ? 'bg-[var(--color-accent)] text-black'
+                    : 'text-gray-300 hover:text-[var(--color-accent)] hover:bg-[#181C22]'
+                }`}
               >
                 {link.name}
               </a>
             ))}
-          </div>
-
-          <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs text-slate-400">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-              <span>Available for 2026/2027 Roles</span>
-            </div>
-            <div className="flex items-center gap-3">
+            <div className="pt-2 border-t border-[#2A313E] mt-2 flex flex-col gap-2">
               <a
-                href={personalInfo.links.github}
+                href={personalInfo.resumeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 text-slate-400 hover:text-white"
-                aria-label="GitHub Profile"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full text-center py-2.5 rounded-full bg-[var(--color-accent)] text-black font-bold text-xs"
               >
-                <GithubIcon className="w-4 h-4" />
-              </a>
-              <a
-                href={personalInfo.links.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-slate-400 hover:text-cyan-400"
-                aria-label="LinkedIn Profile"
-              >
-                <LinkedinIcon className="w-4 h-4" />
+                Download Resume PDF
               </a>
             </div>
-          </div>
+          </nav>
         </div>
       )}
     </header>

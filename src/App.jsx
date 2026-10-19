@@ -1,34 +1,36 @@
 import React from 'react';
 import Navbar from './components/Navbar';
 import CustomCursor from './components/CustomCursor';
+import VoiceAssistant from './components/VoiceAssistant';
 import Hero from './sections/Hero';
 import About from './sections/About';
-import Projects from './sections/Projects';
-import Skills from './sections/Skills';
 import Experience from './sections/Experience';
-import Education from './sections/Education';
-import Approach from './sections/Approach';
+import Projects from './sections/Projects';
+import Certifications from './sections/Certifications';
+import ResumeBanner from './sections/ResumeBanner';
 import Contact from './sections/Contact';
 import Footer from './components/Footer';
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-[#030712] text-slate-100 flex flex-col selection:bg-cyan-500/20 selection:text-cyan-300 relative">
-      {/* Precision Desktop Custom Cursor */}
+    <div className="min-h-screen bg-[var(--color-bg-base)] text-[#D1D5DB] flex flex-col relative transition-colors duration-400">
+      {/* Precision Desktop Custom Cursor with Dynamic Theme Halo */}
       <CustomCursor />
 
-      {/* Floating Glassmorphism Navigation */}
+      {/* Interactive AI Voice Assistant */}
+      <VoiceAssistant />
+
+      {/* Floating Pill Navigation with Theme Palette Switcher */}
       <Navbar />
 
-      {/* Structured Content Sections: About directly after Hero */}
+      {/* Main Sections */}
       <main className="flex-1">
         <Hero />
         <About />
-        <Projects />
-        <Skills />
         <Experience />
-        <Education />
-        <Approach />
+        <Projects />
+        <Certifications />
+        <ResumeBanner />
         <Contact />
       </main>
 
